@@ -10,7 +10,7 @@ void main() {
     Signal<String> testFactory(ref, args) => signal('$args');
 
     const value = 'hi';
-    final result = ref.call(testFactory, value);
+    final result = ref(testFactory, value);
 
     expect(result.value, value);
     expect(ref.containsKey((testFactory, value)), true);
@@ -25,7 +25,7 @@ void main() {
       return signal('$greetText $name');
     }
 
-    final result = ref.call(greetPerson, 'John');
+    final result = ref(greetPerson, 'John');
 
     expect(result.value, 'hello John');
     expect(ref.containsKey((greeting, null)), true);
@@ -41,7 +41,7 @@ void main() {
       return computed(() => '${greetSignal.value} $name');
     }
 
-    final result = ref.call(greetPerson, 'John');
+    final result = ref(greetPerson, 'John');
 
     expect(result.value, 'hello John');
     expect(ref.containsKey((greeting, null)), true);
@@ -63,7 +63,7 @@ void main() {
       return computed(() => '${greetSignal.value} $name', autoDispose: true);
     }
 
-    final result = ref.call(greetPerson, 'John');
+    final result = ref(greetPerson, 'John');
     final unsub = effect(() => result.value);
 
     expect(result.value, 'hello John');
