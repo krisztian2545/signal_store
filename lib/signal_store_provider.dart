@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:signal_store/model/model.dart';
+
+import 'signal_store_container.dart';
 
 class SignalStoreProvider extends InheritedWidget {
   SignalStoreProvider({
