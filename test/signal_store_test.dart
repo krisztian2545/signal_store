@@ -81,4 +81,42 @@ void main() {
     expect(ref.containsKey((greeting, null)), false);
     expect(ref.containsKey((greetPerson, 'John')), false);
   });
+
+  test('live until', () {
+    final ref = Ref();
+
+    Signal<String> greeting(_, __) => signal('hello', autoDispose: true);
+    Computed<String> greetPerson(Ref ref, String name) {
+      final greetSignal = ref(greeting);
+      return computed(() => '${greetSignal.value} $name', autoDispose: true);
+    }
+
+    Signal last(_, __) => signal(null);
+
+    final result = ref(greetPerson, 'John');
+    final unsub = effect(() => result.value);
+
+    expect(result.value, 'hello John');
+    expect(ref.containsKey((greeting, null)), true);
+    expect(ref.containsKey((greetPerson, 'John')), true);
+
+    ref(greeting).value = 'hi';
+
+    expect(result.value, 'hi John');
+    expect(ref.containsKey((greeting, null)), true);
+    expect(ref.containsKey((greetPerson, 'John')), true);
+
+    ref(greeting).liveUntil(ref(last));
+    unsub();
+
+    expect(ref.containsKey((greeting, null)), true);
+    expect(ref.containsKey((greetPerson, 'John')), false);
+    expect(ref.containsKey((last, null)), true);
+
+    ref(last).dispose();
+
+    expect(ref.containsKey((greeting, null)), false);
+    expect(ref.containsKey((greetPerson, 'John')), false);
+    expect(ref.containsKey((last, null)), false);
+  });
 }
