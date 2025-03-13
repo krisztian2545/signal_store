@@ -9,15 +9,13 @@ extension SignalStoreContextExtension on BuildContext {
     SignalFactory<T, A, S> signalFactory, [
     A? args,
   ]) {
-    return SignalStoreProvider.of(this, listen: false)
-        .container(signalFactory, args);
+    return SignalStoreProvider.of(this, listen: false)(signalFactory, args);
   }
 
   S watch<T, A, S extends ReadonlySignalMixin<T>>(
     SignalFactory<T, A, S> signalFactory, [
     A? args,
   ]) {
-    return SignalStoreProvider.of(this, listen: true)
-        .container(signalFactory, args);
+    return SignalStoreProvider.of(this, listen: true)(signalFactory, args);
   }
 }
