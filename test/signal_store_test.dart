@@ -82,7 +82,7 @@ void main() {
     expect(ref.containsKey((greetPerson, 'John')), false);
   });
 
-  test('live until', () {
+  test('liveUntil', () {
     final ref = Ref();
 
     Signal<String> greeting(_, __) => signal('hello', autoDispose: true);
@@ -118,5 +118,77 @@ void main() {
     expect(ref.containsKey((greeting, null)), false);
     expect(ref.containsKey((greetPerson, 'John')), false);
     expect(ref.containsKey((last, null)), false);
+  });
+
+  test('disposeWithSignal with object having a dispose function', () {
+    final ref = Ref();
+
+    Signal<String> greeting(_, __) => signal('hello', autoDispose: true);
+    Computed<String> greetPerson(Ref ref, String name) {
+      final greetSignal = ref(greeting);
+      return computed(() => '${greetSignal.value} $name', autoDispose: true);
+    }
+
+    final greetPersonSignal = ref(greetPerson, 'John');
+    final unsub = effect(() => greetPersonSignal.value);
+
+    final data = ['0', '1'];
+    final testObject = (
+      data,
+      dispose: () => data.clear(),
+    )..disposeWithSignal(greetPersonSignal);
+
+    expect(greetPersonSignal.value, 'hello John');
+    expect(ref.containsKey((greeting, null)), true);
+    expect(ref.containsKey((greetPerson, 'John')), true);
+    expect(testObject.$1.isNotEmpty, true);
+
+    ref(greeting).value = 'hi';
+
+    expect(greetPersonSignal.value, 'hi John');
+    expect(ref.containsKey((greeting, null)), true);
+    expect(ref.containsKey((greetPerson, 'John')), true);
+    expect(testObject.$1.isNotEmpty, true);
+
+    unsub();
+
+    expect(ref.containsKey((greeting, null)), false);
+    expect(ref.containsKey((greetPerson, 'John')), false);
+    expect(testObject.$1.isEmpty, true);
+  });
+
+  test('disposeWithSignal with a provided dispose function', () {
+    final ref = Ref();
+
+    Signal<String> greeting(_, __) => signal('hello', autoDispose: true);
+    Computed<String> greetPerson(Ref ref, String name) {
+      final greetSignal = ref(greeting);
+      return computed(() => '${greetSignal.value} $name', autoDispose: true);
+    }
+
+    final greetPersonSignal = ref(greetPerson, 'John');
+    final unsub = effect(() => greetPersonSignal.value);
+
+    final data = ['0', '1'];
+    final testObject = (data,)
+      ..disposeWithSignal(greetPersonSignal, (o) => o.$1.clear());
+
+    expect(greetPersonSignal.value, 'hello John');
+    expect(ref.containsKey((greeting, null)), true);
+    expect(ref.containsKey((greetPerson, 'John')), true);
+    expect(testObject.$1.isNotEmpty, true);
+
+    ref(greeting).value = 'hi';
+
+    expect(greetPersonSignal.value, 'hi John');
+    expect(ref.containsKey((greeting, null)), true);
+    expect(ref.containsKey((greetPerson, 'John')), true);
+    expect(testObject.$1.isNotEmpty, true);
+
+    unsub();
+
+    expect(ref.containsKey((greeting, null)), false);
+    expect(ref.containsKey((greetPerson, 'John')), false);
+    expect(testObject.$1.isEmpty, true);
   });
 }
