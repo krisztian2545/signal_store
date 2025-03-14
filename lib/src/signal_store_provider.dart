@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import 'signal_store_container.dart';
+import 'ref.dart';
 
 class _SignalStoreInheritedWidget extends InheritedWidget {
   const _SignalStoreInheritedWidget({

@@ -1,5 +1,5 @@
 export 'src/build_context_extension.dart';
-export 'src/signal_store_container.dart';
+export 'src/ref.dart';
 export 'src/signal_store_provider.dart';
 export 'src/signal_utils.dart';
 

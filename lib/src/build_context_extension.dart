@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:signals/signals.dart';
 
-import 'signal_store_container.dart';
+import 'ref.dart';
 import 'signal_store_provider.dart';
 
 extension SignalStoreContextExtension on BuildContext {

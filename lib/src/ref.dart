@@ -30,4 +30,18 @@ extension type Ref._(SignalContainer container) implements SignalContainer {
   ]) {
     return container((signalFactory, args)) as S;
   }
+
+  S? remove<T, A, S extends ReadonlySignalMixin<T>>(
+    SignalFactory<T, A, S> signalFactory, [
+    A? args,
+  ]) {
+    return store.remove((signalFactory, args)) as S;
+  }
+
+  bool contains<T, A, S extends ReadonlySignalMixin<T>>(
+    SignalFactory<T, A, S> signalFactory, [
+    A? args,
+  ]) {
+    return store.containsKey((signalFactory, args));
+  }
 }
