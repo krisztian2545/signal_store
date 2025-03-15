@@ -33,4 +33,20 @@ extension SignalStoreObjectUtils<T extends Object> on T {
     });
     return this;
   }
+
+  T disposeWith(Object o, [void Function(T)? dispose]) {
+    final pair = (this, o);
+    if (_subscriptions.contains(pair)) return this;
+    _subscriptions.add(pair);
+
+    (o as dynamic).onDispose(() {
+      if (dispose != null) {
+        dispose(this);
+      } else {
+        (this as dynamic).dispose();
+      }
+      _subscriptions.remove(pair);
+    });
+    return this;
+  }
 }

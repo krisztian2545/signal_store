@@ -11,6 +11,22 @@ class Ref<T, S extends ReadonlySignalMixin<T>> {
   ReadonlySignal<T> get generatedSignal =>
       getGeneratedSignal() as ReadonlySignal<T>;
 
+  final List<void Function()> _disposeCallbacks = [];
+
+  void onDispose(void Function() callback) {
+    _disposeCallbacks.add(callback);
+  }
+
+  bool removeDisposeCallback(void Function() callback) {
+    return _disposeCallbacks.remove(callback);
+  }
+
+  void dispose() {
+    for (int i = 0; i < _disposeCallbacks.length; i++) {
+      _disposeCallbacks[i]();
+    }
+  }
+
   // [SignalStoreContainer] proxy API
 
   CS call<CT, CA, CS extends ReadonlySignalMixin<CT>>(
@@ -20,11 +36,19 @@ class Ref<T, S extends ReadonlySignalMixin<T>> {
     return store(signalFactory, args);
   }
 
+  /// Warning: this doesn't dispose the signal!
   CS? remove<CT, CA, CS extends ReadonlySignalMixin<CT>>(
     SignalFactory<CT, CA, CS> signalFactory, [
     CA? args,
   ]) {
     return store.remove(signalFactory, args);
+  }
+
+  CS? removeAndDispose<CT, CA, CS extends ReadonlySignalMixin<CT>>(
+    SignalFactory<CT, CA, CS> signalFactory, [
+    CA? args,
+  ]) {
+    return store.removeAndDispose(signalFactory, args);
   }
 
   bool contains<CT, CA, CS extends ReadonlySignalMixin<CT>>(

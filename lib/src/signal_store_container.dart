@@ -20,13 +20,12 @@ extension type SignalStoreContainer._(SignalContainer container)
     SignalStoreContainer Function() getContainer,
     (SignalFactory<T, A, S>, A) key,
   ) {
-    final (constructor, args) = key;
+    final (generatorFunction, args) = key;
     // [SignalContainer] cares about removing the disposed signal from the container
     late final S generatedSignal;
-    return generatedSignal = constructor(
-      Ref(getContainer(), () => generatedSignal),
-      args,
-    );
+    final ref = Ref<T, S>(getContainer(), () => generatedSignal);
+    generatedSignal = generatorFunction(ref, args)..onDispose(ref.dispose);
+    return generatedSignal;
   }
 
   S call<T, A, S extends ReadonlySignalMixin<T>>(
@@ -36,11 +35,20 @@ extension type SignalStoreContainer._(SignalContainer container)
     return container((signalFactory, args)) as S;
   }
 
+  /// Warning: this doesn't dispose the signal!
   S? remove<T, A, S extends ReadonlySignalMixin<T>>(
     SignalFactory<T, A, S> signalFactory, [
     A? args,
   ]) {
     return store.remove((signalFactory, args)) as S;
+  }
+
+  S? removeAndDispose<T, A, S extends ReadonlySignalMixin<T>>(
+    SignalFactory<T, A, S> signalFactory, [
+    A? args,
+  ]) {
+    final removedSignal = store.remove((signalFactory, args))?..dispose();
+    return removedSignal as S;
   }
 
   bool contains<T, A, S extends ReadonlySignalMixin<T>>(

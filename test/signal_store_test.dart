@@ -191,6 +191,25 @@ void main() {
     expect(testObject.$1.isEmpty, true);
   });
 
+  test('disposeWith(ref)', () {
+    final ref = SignalStoreContainer();
+    bool isDisposed = false;
+    testSignalProvider(Ref ref, _) {
+      (dispose: () => isDisposed = true,).disposeWith(ref);
+      return signal(0);
+    }
+
+    ref(testSignalProvider);
+
+    expect(ref.contains(testSignalProvider), true);
+    expect(isDisposed, false);
+
+    ref(testSignalProvider).dispose();
+
+    expect(ref.contains(testSignalProvider), false);
+    expect(isDisposed, true);
+  });
+
   test('ref.generatedSignal', () {
     final ref = SignalStoreContainer();
     late final ReadonlySignal Function() getSignal;
