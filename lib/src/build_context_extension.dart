@@ -1,8 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:signals/signals.dart';
-
-import 'ref.dart';
-import 'signal_store_provider.dart';
+import 'package:signal_store/signal_store.dart';
 
 extension SignalStoreContextExtension on BuildContext {
   S read<T, A, S extends ReadonlySignalMixin<T>>(

@@ -1,11 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:signal_store/signal_store.dart';
-import 'package:signals/signals.dart';
 
 void main() {
   test('create and get', () {
-    final ref = Ref();
+    final ref = SignalStoreContainer();
 
     Signal<String> testFactory(ref, args) => signal('$args');
 
@@ -17,7 +16,7 @@ void main() {
   });
 
   test('reference other signal', () {
-    final ref = Ref();
+    final ref = SignalStoreContainer();
 
     Signal<String> greeting(_, __) => signal('hello');
     Signal<String> greetPerson(Ref ref, String name) {
@@ -33,7 +32,7 @@ void main() {
   });
 
   test('update signal when referenced signal changes', () {
-    final ref = Ref();
+    final ref = SignalStoreContainer();
 
     Signal<String> greeting(_, __) => signal('hello');
     Computed<String> greetPerson(Ref ref, String name) {
@@ -55,7 +54,7 @@ void main() {
   });
 
   test('auto dispose signals', () {
-    final ref = Ref();
+    final ref = SignalStoreContainer();
 
     Signal<String> greeting(_, __) => signal('hello', autoDispose: true);
     Computed<String> greetPerson(Ref ref, String name) {
@@ -83,7 +82,7 @@ void main() {
   });
 
   test('liveUntil', () {
-    final ref = Ref();
+    final ref = SignalStoreContainer();
 
     Signal<String> greeting(_, __) => signal('hello', autoDispose: true);
     Computed<String> greetPerson(Ref ref, String name) {
@@ -121,7 +120,7 @@ void main() {
   });
 
   test('disposeWithSignal with object having a dispose function', () {
-    final ref = Ref();
+    final ref = SignalStoreContainer();
 
     Signal<String> greeting(_, __) => signal('hello', autoDispose: true);
     Computed<String> greetPerson(Ref ref, String name) {
@@ -158,7 +157,7 @@ void main() {
   });
 
   test('disposeWithSignal with a provided dispose function', () {
-    final ref = Ref();
+    final ref = SignalStoreContainer();
 
     Signal<String> greeting(_, __) => signal('hello', autoDispose: true);
     Computed<String> greetPerson(Ref ref, String name) {
@@ -190,5 +189,19 @@ void main() {
     expect(ref.containsKey((greeting, null)), false);
     expect(ref.containsKey((greetPerson, 'John')), false);
     expect(testObject.$1.isEmpty, true);
+  });
+
+  test('ref.generatedSignal', () {
+    final ref = SignalStoreContainer();
+    late final ReadonlySignal Function() getSignal;
+
+    Signal<String> testSignalProvider(Ref ref, __) {
+      getSignal = () => ref.generatedSignal;
+      return signal('hello');
+    }
+
+    final testSignal = ref(testSignalProvider);
+
+    expect(testSignal, getSignal());
   });
 }

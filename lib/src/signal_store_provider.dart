@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
-
-import 'ref.dart';
+import 'package:signal_store/signal_store.dart';
 
 class _SignalStoreInheritedWidget extends InheritedWidget {
   const _SignalStoreInheritedWidget({
@@ -9,7 +8,7 @@ class _SignalStoreInheritedWidget extends InheritedWidget {
     super.key,
   });
 
-  final Ref container;
+  final SignalStoreContainer container;
 
   @override
   bool updateShouldNotify(covariant InheritedWidget oldWidget) =>
@@ -31,7 +30,7 @@ class SignalStoreProvider extends StatefulWidget {
 
   const SignalStoreProvider.value({
     super.key,
-    required Ref this.store,
+    required SignalStoreContainer this.store,
     this.child,
     this.builder,
     this.disposeBehavior = const DoNotDisposeGivenSignalStore(),
@@ -40,7 +39,7 @@ class SignalStoreProvider extends StatefulWidget {
           "Either child or builder must be given.",
         );
 
-  final Ref? store;
+  final SignalStoreContainer? store;
 
   final Widget? child;
   final Widget Function(BuildContext context, Widget? child)? builder;
@@ -50,7 +49,7 @@ class SignalStoreProvider extends StatefulWidget {
   @override
   State<SignalStoreProvider> createState() => _SignalStoreProviderState();
 
-  static Ref of(BuildContext context, {bool listen = true}) {
+  static SignalStoreContainer of(BuildContext context, {bool listen = true}) {
     final provider = listen
         ? context
             .dependOnInheritedWidgetOfExactType<_SignalStoreInheritedWidget>()
@@ -71,9 +70,9 @@ class SignalStoreProvider extends StatefulWidget {
 }
 
 class _SignalStoreProviderState extends State<SignalStoreProvider> {
-  late Ref _store = _getStore();
+  late SignalStoreContainer _store = _getStore();
 
-  Ref _getStore() => widget.store ?? Ref();
+  SignalStoreContainer _getStore() => widget.store ?? SignalStoreContainer();
 
   @override
   void didUpdateWidget(covariant SignalStoreProvider oldWidget) {
@@ -99,11 +98,11 @@ class _SignalStoreProviderState extends State<SignalStoreProvider> {
 }
 
 typedef SignalStoreDisposeBehaviorCallback = void Function(
-    SignalStoreProvider widget, Ref store);
+    SignalStoreProvider widget, SignalStoreContainer store);
 
 abstract class SignalStoreProviderDisposeBehavior {
   const SignalStoreProviderDisposeBehavior();
-  void dispose(SignalStoreProvider widget, Ref store);
+  void dispose(SignalStoreProvider widget, SignalStoreContainer store);
 }
 
 class SignalStoreDisposeBehaviorDelegate
@@ -115,14 +114,14 @@ class SignalStoreDisposeBehaviorDelegate
   final SignalStoreDisposeBehaviorCallback callback;
 
   @override
-  void dispose(SignalStoreProvider widget, Ref store) =>
+  void dispose(SignalStoreProvider widget, SignalStoreContainer store) =>
       callback(widget, store);
 }
 
 class AlwaysDisposeSignalStore extends SignalStoreProviderDisposeBehavior {
   const AlwaysDisposeSignalStore();
   @override
-  void dispose(SignalStoreProvider widget, Ref store) {
+  void dispose(SignalStoreProvider widget, SignalStoreContainer store) {
     store.dispose();
   }
 }
@@ -130,7 +129,7 @@ class AlwaysDisposeSignalStore extends SignalStoreProviderDisposeBehavior {
 class DoNotDisposeGivenSignalStore extends SignalStoreProviderDisposeBehavior {
   const DoNotDisposeGivenSignalStore();
   @override
-  void dispose(SignalStoreProvider widget, Ref store) {
+  void dispose(SignalStoreProvider widget, SignalStoreContainer store) {
     // dispose store if it wasn't injected from outside
     if (widget.store == null) {
       store.dispose();

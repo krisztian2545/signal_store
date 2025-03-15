@@ -1,47 +1,36 @@
-import 'package:signals/signals.dart';
+import 'package:signal_store/signal_store.dart';
 
-typedef SignalFactory<T, A, S extends ReadonlySignalMixin<T>> = S Function(
-  Ref ref,
-  A args,
-);
+class Ref<T, S extends ReadonlySignalMixin<T>> {
+  Ref(this.store, this.getGeneratedSignal);
 
-extension type Ref._(SignalContainer container) implements SignalContainer {
-  factory Ref() {
-    late final Ref ref;
-    ref = Ref._(SignalContainer(
-      (k) => _create(() => ref, k),
-      cache: true,
-    ));
-    return ref;
-  }
+  final SignalStoreContainer store;
+  final S Function() getGeneratedSignal;
 
-  static S _create<T, S extends ReadonlySignalMixin<T>>(
-    Ref Function() getContainer,
-    key,
-  ) {
-    final (constructor, args) = key;
-    // [SignalContainer] cares about removing the disposed signal from the container
-    return constructor(getContainer(), args);
-  }
+  /// Don't use right inside the generator function, only in a code
+  /// that runs after generating the signal. So in callbacks and sync code.
+  ReadonlySignal<T> get generatedSignal =>
+      getGeneratedSignal() as ReadonlySignal<T>;
 
-  S call<T, A, S extends ReadonlySignalMixin<T>>(
-    SignalFactory<T, A, S> signalFactory, [
-    A? args,
+  // [SignalStoreContainer] proxy API
+
+  CS call<CT, CA, CS extends ReadonlySignalMixin<CT>>(
+    SignalFactory<CT, CA, CS> signalFactory, [
+    CA? args,
   ]) {
-    return container((signalFactory, args)) as S;
+    return store(signalFactory, args);
   }
 
-  S? remove<T, A, S extends ReadonlySignalMixin<T>>(
-    SignalFactory<T, A, S> signalFactory, [
-    A? args,
+  CS? remove<CT, CA, CS extends ReadonlySignalMixin<CT>>(
+    SignalFactory<CT, CA, CS> signalFactory, [
+    CA? args,
   ]) {
-    return store.remove((signalFactory, args)) as S;
+    return store.remove(signalFactory, args);
   }
 
-  bool contains<T, A, S extends ReadonlySignalMixin<T>>(
-    SignalFactory<T, A, S> signalFactory, [
-    A? args,
+  bool contains<CT, CA, CS extends ReadonlySignalMixin<CT>>(
+    SignalFactory<CT, CA, CS> signalFactory, [
+    CA? args,
   ]) {
-    return store.containsKey((signalFactory, args));
+    return store.contains(signalFactory, args);
   }
 }
