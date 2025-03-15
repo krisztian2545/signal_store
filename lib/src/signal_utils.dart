@@ -1,15 +1,28 @@
-import 'package:signals/signals.dart';
+import 'package:signal_store/signal_store.dart';
 
 final _subscriptions = <(Object, Object)>{};
 
 extension SignalStoreSignalUtils<T, S extends ReadonlySignal<T>> on S {
-  S liveUntil(ReadonlySignal other) {
+  S liveUntilSignal(ReadonlySignal other) {
     final pair = (this, other);
     if (_subscriptions.contains(pair)) return this;
     _subscriptions.add(pair);
 
     final unsub = subscribe((_) {});
     other.onDispose(() {
+      unsub();
+      _subscriptions.remove(pair);
+    });
+    return this;
+  }
+
+  S liveUntilRef(Ref ref) {
+    final pair = (this, ref);
+    if (_subscriptions.contains(pair)) return this;
+    _subscriptions.add(pair);
+
+    final unsub = subscribe((_) {});
+    ref.onDispose(() {
       unsub();
       _subscriptions.remove(pair);
     });

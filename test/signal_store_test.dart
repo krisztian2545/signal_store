@@ -81,7 +81,7 @@ void main() {
     expect(ref.containsKey((greetPerson, 'John')), false);
   });
 
-  test('liveUntil', () {
+  test('liveUntilSignal', () {
     final ref = SignalStoreContainer();
 
     Signal<String> greeting(_, __) => signal('hello', autoDispose: true);
@@ -105,7 +105,7 @@ void main() {
     expect(ref.containsKey((greeting, null)), true);
     expect(ref.containsKey((greetPerson, 'John')), true);
 
-    ref(greeting).liveUntil(ref(last));
+    ref(greeting).liveUntilSignal(ref(last));
     unsub();
 
     expect(ref.containsKey((greeting, null)), true);
@@ -117,6 +117,26 @@ void main() {
     expect(ref.containsKey((greeting, null)), false);
     expect(ref.containsKey((greetPerson, 'John')), false);
     expect(ref.containsKey((last, null)), false);
+  });
+
+  test('liveUntilRef', () {
+    final ref = SignalStoreContainer();
+    final autoDisposeSignal = signal(0, autoDispose: true);
+
+    controlSignalProvider(Ref ref, _) {
+      autoDisposeSignal.liveUntilRef(ref);
+      return signal(0);
+    }
+
+    ref(controlSignalProvider);
+
+    expect(ref.contains(controlSignalProvider), true);
+    expect(autoDisposeSignal.disposed, false);
+
+    ref(controlSignalProvider).dispose();
+
+    expect(ref.contains(controlSignalProvider), false);
+    expect(autoDisposeSignal.disposed, true);
   });
 
   test('disposeWithSignal with object having a dispose function', () {
