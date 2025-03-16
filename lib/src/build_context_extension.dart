@@ -2,17 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:signal_store/signal_store.dart';
 
 extension SignalStoreContextExtension on BuildContext {
-  S read<T, A, S extends ReadonlySignalMixin<T>>(
-    SignalFactory<T, A, S> signalFactory, [
-    A? args,
-  ]) {
-    return SignalStoreProvider.of(this, listen: false)(signalFactory, args);
-  }
+  SignalStoreContainer get readStore =>
+      SignalStoreProvider.of(this, listen: false);
 
-  S watch<T, A, S extends ReadonlySignalMixin<T>>(
-    SignalFactory<T, A, S> signalFactory, [
-    A? args,
-  ]) {
-    return SignalStoreProvider.of(this, listen: true)(signalFactory, args);
-  }
+  SignalStoreContainer get store => SignalStoreProvider.of(this, listen: true);
 }
