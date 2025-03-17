@@ -243,4 +243,17 @@ void main() {
 
     expect(testSignal, getSignal());
   });
+
+  test('existing', () {
+    final ref = SignalStoreContainer();
+    testFactory(ref, args) => signal(0);
+
+    expect(ref.containsKey((testFactory, null)), false);
+    expect(ref.existing(testFactory), null);
+
+    final data = ref(testFactory);
+
+    expect(ref.containsKey((testFactory, null)), true);
+    expect(ref.existing(testFactory), data);
+  });
 }

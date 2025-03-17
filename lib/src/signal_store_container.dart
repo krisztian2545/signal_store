@@ -57,4 +57,15 @@ extension type SignalStoreContainer._(SignalContainer container)
   ]) {
     return store.containsKey((signalFactory, args));
   }
+
+  S? existing<T, A, S extends ReadonlySignalMixin<T>>(
+    SignalFactory<T, A, S> signalFactory, [
+    A? args,
+  ]) {
+    final key = (signalFactory, args);
+    if (container.containsKey(key)) {
+      return container(key) as S;
+    }
+    return null;
+  }
 }
