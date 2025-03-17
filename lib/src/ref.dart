@@ -57,4 +57,11 @@ class Ref<T, S extends ReadonlySignalMixin<T>> {
   ]) {
     return store.contains(signalFactory, args);
   }
+
+  CS? existing<CT, CA, CS extends ReadonlySignalMixin<CT>>(
+    SignalFactory<CT, CA, CS> signalFactory, [
+    CA? args,
+  ]) {
+    return store.existing(signalFactory, args);
+  }
 }

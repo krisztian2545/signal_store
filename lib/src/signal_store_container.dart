@@ -40,14 +40,14 @@ extension type SignalStoreContainer._(SignalContainer container)
     SignalFactory<T, A, S> signalFactory, [
     A? args,
   ]) {
-    return store.remove((signalFactory, args)) as S;
+    return container.remove((signalFactory, args)) as S;
   }
 
   S? removeAndDispose<T, A, S extends ReadonlySignalMixin<T>>(
     SignalFactory<T, A, S> signalFactory, [
     A? args,
   ]) {
-    final removedSignal = store.remove((signalFactory, args))?..dispose();
+    final removedSignal = container.remove((signalFactory, args))?..dispose();
     return removedSignal as S;
   }
 
@@ -55,7 +55,7 @@ extension type SignalStoreContainer._(SignalContainer container)
     SignalFactory<T, A, S> signalFactory, [
     A? args,
   ]) {
-    return store.containsKey((signalFactory, args));
+    return container.containsKey((signalFactory, args));
   }
 
   S? existing<T, A, S extends ReadonlySignalMixin<T>>(
